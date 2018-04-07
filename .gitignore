@@ -7,3 +7,6 @@
 # python files
 __pycache__
 *.pyc
+
+# db
+*db
