@@ -7,6 +7,8 @@ Base = declarative_base()
 
 
 class User(Base):
+    """User model"""
+
     __tablename__ = 'user'
 
     id = Column(Integer, primary_key=True)
@@ -16,6 +18,8 @@ class User(Base):
 
 
 class Project(Base):
+    """Project model"""
+
     __tablename__ = 'project'
 
     id = Column(Integer, primary_key=True)
@@ -33,6 +37,8 @@ class Project(Base):
 
 
 class Ledger_Item(Base):
+    """Ledger model"""
+
     __tablename__ = 'ledger_item'
 
     id = Column(Integer, primary_key=True)

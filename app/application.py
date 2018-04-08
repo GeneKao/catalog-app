@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 
-""" My bookkeeping app
+""" My bookkeeping app.
 
+Example:
+    To run this code using python3 on the console to
+    start the flask server. and go to http://localhost:8000/
+
+    python3 application.py
 """
 
 __author__ = "Gene Ting-Chun Kao"
@@ -43,6 +48,7 @@ session = DBSession()
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
+    """Google Oauth login."""
     # Validate state token
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
@@ -93,8 +99,8 @@ def gconnect():
     stored_access_token = login_session.get('access_token')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_access_token is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'),
-                                 200)
+        response = make_response(
+            json.dumps('Current user is already connected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -125,13 +131,15 @@ def gconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 300px; height: 300px;border-radius: '
+    output += '150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;">'
     flash("you are now logged in as %s" % login_session['username'])
     print("done!")
     return output
 
 
 def createUser(login_session):
+    """Create user."""
     newUser = User(name=login_session['username'], email=login_session[
                    'email'], picture=login_session['picture'])
     session.add(newUser)
@@ -141,21 +149,21 @@ def createUser(login_session):
 
 
 def getUserInfo(user_id):
+    """Get user info from id."""
     user = session.query(User).filter_by(id=user_id).one()
     return user
 
 
 def getUserID(email):
-    try:
-        user = session.query(User).filter_by(email=email).one()
-        return user.id
-    except:
-        return None
+    """Get user ID from email."""
+    user = session.query(User).filter_by(email=email).one()
+    return user.id
 
 
 # DISCONNECT - Revoke a current user's token and reset their login_session
 @app.route('/gdisconnect')
 def gdisconnect():
+    """Google log out funciton."""
     access_token = login_session.get('access_token')
     if access_token is None:
         print('Access Token is None')
@@ -166,7 +174,8 @@ def gdisconnect():
     print('In gdisconnect access token is %s', access_token)
     print('User name is: ')
     print(login_session['username'])
-    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session['access_token']
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' \
+          % login_session['access_token']
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
     print('result is ')
@@ -190,6 +199,7 @@ def gdisconnect():
 
 @app.route('/login')
 def showLogin():
+    """Login page."""
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in range(32))
     login_session['state'] = state
@@ -200,8 +210,8 @@ def showLogin():
 
 # JSON APIs to view Project Information
 @app.route('/project/<int:project_id>/ledger/JSON')
-def projectMenuJSON(project_id):
-    project = session.query(Project).filter_by(id=project_id).one()
+def projectJSON(project_id):
+    """Show a project in JSON format."""
     items = session.query(Ledger_Item).filter_by(
         project_id=project_id).all()
     return jsonify(Ledgers=[i.serialize for i in items])
@@ -209,6 +219,7 @@ def projectMenuJSON(project_id):
 
 @app.route('/project/<int:project_id>/ledger/<int:ledger_id>/JSON')
 def ledgerItemJSON(project_id, ledger_id):
+    """Show public ledger items in JSON format."""
     item = session.query(Ledger_Item).filter_by(id=ledger_id).one().serialize
     public_ledger = {'name': item['name'], 'description': item['description'],
                      'types': item['types'], 'id': item['id']}
@@ -217,6 +228,7 @@ def ledgerItemJSON(project_id, ledger_id):
 
 @app.route('/project/JSON')
 def projectJSON():
+    """Show all projects in JSON format."""
     projects = session.query(Project).all()
     return jsonify(projects=[r.serialize for r in projects])
 
@@ -225,6 +237,7 @@ def projectJSON():
 @app.route('/')
 @app.route('/project/')
 def showProjects():
+    """List all projects and render projects.html."""
     projects = session.query(Project).order_by(asc(Project.name))
     return render_template('projects.html', projects=projects)
 
@@ -232,6 +245,7 @@ def showProjects():
 # Create a new project
 @app.route('/project/new/', methods=['GET', 'POST'])
 def newProject():
+    """Create a new project."""
     if request.method == 'POST':
         newProject = Project(
             name=request.form['name'], user_id=login_session['user_id'])
@@ -246,6 +260,7 @@ def newProject():
 # Edit a project
 @app.route('/project/<int:project_id>/edit/', methods=['GET', 'POST'])
 def editProject(project_id):
+    """Edit a project."""
     editedProject = session.query(
         Project).filter_by(id=project_id).one()
     if request.method == 'POST':
@@ -260,6 +275,7 @@ def editProject(project_id):
 # Delete a project
 @app.route('/project/<int:project_id>/delete/', methods=['GET', 'POST'])
 def deleteProject(project_id):
+    """Delete a project."""
     projectToDelete = session.query(
         Project).filter_by(id=project_id).one()
     if request.method == 'POST':
@@ -271,11 +287,13 @@ def deleteProject(project_id):
         return render_template('deleteProject.html', project=projectToDelete)
 
 
-ledger_types = ("ATM", "Bar_Restaurant", "Business expenses", "Cash", "Education",
-                "Family_Friends", "Food_Groceries", "Healthcare_Drug_Stores",
-                "Household_Utilities", "Income", "Insurance_Funances",
-                "Leisure_Enterainment", "Media_Electronics", "Salary",
-                "Saving_Investments", "Shopping", "Subsriptions_Donations",
+# different ledger types, this is following N26 bank types.
+ledger_types = ("ATM", "Bar_Restaurant", "Business expenses",
+                "Cash", "Education", "Family_Friends", "Food_Groceries",
+                "Healthcare_Drug_Stores", "Household_Utilities",
+                "Income", "Insurance_Funances", "Leisure_Enterainment",
+                "Media_Electronics", "Salary", "Saving_Investments",
+                "Shopping", "Subsriptions_Donations",
                 "Tax_Fines", "Transport_Car", "Travel_Holidays")
 
 
@@ -283,38 +301,51 @@ ledger_types = ("ATM", "Bar_Restaurant", "Business expenses", "Cash", "Education
 @app.route('/project/<int:project_id>/')
 @app.route('/project/<int:project_id>/ledger/')
 def showLedger(project_id):
+    """Show a ledger."""
     project = session.query(Project).filter_by(id=project_id).one()
     creator = getUserInfo(project.user_id)
     items = session.query(Ledger_Item).filter_by(
         project_id=project_id).all()
-    if 'username' not in login_session or creator.id != login_session['user_id']:
-        return render_template('publicledger.html', items=items, project=project, creator=creator)
+    if 'username' not in login_session or \
+            creator.id != login_session['user_id']:
+        return render_template('publicledger.html',
+                               items=items, project=project, creator=creator)
     else:
-        return render_template('ledger.html', items=items, project=project, creator=creator, ledger_types=ledger_types)
+        return render_template('ledger.html',
+                               items=items, project=project,
+                               creator=creator, ledger_types=ledger_types)
 
 
 # Create a new ledger item
 @app.route('/project/<int:project_id>/ledger/new/', methods=['GET', 'POST'])
 def newLedgerItem(project_id):
+    """Add a new ledger."""
     project = session.query(Project).filter_by(id=project_id).one()
 
     if request.method == 'POST':
-        newItem = Ledger_Item(name=request.form['name'], description=request.form['description'],
-                              types=request.form['types'], cost=request.form['cost'],
+        newItem = Ledger_Item(name=request.form['name'],
+                              description=request.form['description'],
+                              types=request.form['types'],
+                              cost=request.form['cost'],
                               date=request.form['date'],
-                              project_id=project_id, user_id=project.user_id)
+                              project_id=project_id,
+                              user_id=project.user_id)
         session.add(newItem)
         session.commit()
         flash('New Menu %s Item Successfully Created' % (newItem.name))
-        return redirect(url_for('showLedger', project_id=project_id))
+        return redirect(url_for('showLedger',
+                                project_id=project_id))
     else:
-        return render_template('newLedgerItem.html', project_id=project_id, ledger_types=ledger_types)
+        return render_template('newLedgerItem.html',
+                               project_id=project_id,
+                               ledger_types=ledger_types)
 
 
 # Edit a ledger item
-@app.route('/project/<int:project_id>/ledger/<int:ledger_id>/edit', methods=['GET', 'POST'])
+@app.route('/project/<int:project_id>/ledger/<int:ledger_id>/edit',
+           methods=['GET', 'POST'])
 def editLedgerItem(project_id, ledger_id):
-
+    """Edit a existing ledger."""
     editedItem = session.query(Ledger_Item).filter_by(id=ledger_id).one()
     project = session.query(Project).filter_by(id=project_id).one()
     if request.method == 'POST':
@@ -333,13 +364,16 @@ def editLedgerItem(project_id, ledger_id):
             flash('Menu Item Successfully Edited')
         return redirect(url_for('showLedger', project_id=project_id))
     else:
-        return render_template('editLedgerItem.html', project_id=project_id, ledger_id=ledger_id, item=editedItem, ledger_types=ledger_types)
+        return render_template('editLedgerItem.html',
+                               project_id=project_id, ledger_id=ledger_id,
+                               item=editedItem, ledger_types=ledger_types)
 
 
 # Delete a ledger item
-@app.route('/project/<int:project_id>/ledger/<int:ledger_id>/delete', methods=['GET', 'POST'])
+@app.route('/project/<int:project_id>/ledger/<int:ledger_id>/delete',
+           methods=['GET', 'POST'])
 def deleteLedgerItem(project_id, ledger_id):
-    project = session.query(Project).filter_by(id=project_id).one()
+    """Delete a ledger."""
     itemToDelete = session.query(Ledger_Item).filter_by(id=ledger_id).one()
     if request.method == 'POST':
         session.delete(itemToDelete)
@@ -347,7 +381,8 @@ def deleteLedgerItem(project_id, ledger_id):
         flash('Menu Item Successfully Deleted')
         return redirect(url_for('showLedger', project_id=project_id))
     else:
-        return render_template('deleteLedgerItem.html', item=itemToDelete, project_id=project_id)
+        return render_template('deleteLedgerItem.html',
+                               item=itemToDelete, project_id=project_id)
 
 
 if __name__ == '__main__':
