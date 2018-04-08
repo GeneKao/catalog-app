@@ -286,6 +286,13 @@ def showLedger(project_id):
 @app.route('/project/<int:project_id>/ledger/new/', methods=['GET', 'POST'])
 def newLedgerItem(project_id):
     project = session.query(Project).filter_by(id=project_id).one()
+    ledger_types = ("ATM", "Bar & Restaurant", "Business expenses", "Cash", "Education",
+                    "Family & Friends", "Food & Groceries", "Healthcare & Drug Stores",
+                    "Household & Utilities", "Income", "Insurance & Funances",
+                    "Leisure & Enterainment", "Media & Electronics", "Salary",
+                    "Saving & Investments", "Shopping", "Subsriptions & Donations",
+                    "Tax & Fines", "Transport & Car", "Travel & Holidays")
+
     if request.method == 'POST':
         newItem = Ledger_Item(name=request.form['name'], description=request.form['description'],
                               types=request.form['types'], cost=request.form['cost'],
@@ -295,7 +302,7 @@ def newLedgerItem(project_id):
         flash('New Menu %s Item Successfully Created' % (newItem.name))
         return redirect(url_for('showLedger', project_id=project_id))
     else:
-        return render_template('newLedgerItem.html', project_id=project_id)
+        return render_template('newLedgerItem.html', project_id=project_id, ledger_types=ledger_types)
 
 
 # Edit a ledger item
