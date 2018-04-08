@@ -209,8 +209,10 @@ def projectMenuJSON(project_id):
 
 @app.route('/project/<int:project_id>/ledger/<int:ledger_id>/JSON')
 def ledgerItemJSON(project_id, ledger_id):
-    item = session.query(Ledger_Item).filter_by(id=ledger_id).one()
-    return jsonify(Ledger_Item=item.serialize)
+    item = session.query(Ledger_Item).filter_by(id=ledger_id).one().serialize
+    public_ledger = {'name': item['name'], 'description': item['description'],
+                     'types': item['types'], 'id': item['id']}
+    return jsonify(Ledger_Item=public_ledger)
 
 
 @app.route('/project/JSON')
