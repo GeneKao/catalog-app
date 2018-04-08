@@ -114,6 +114,14 @@ able to view, add, edit, and delete menu items and restaurants.
 
 
 
+## Credits
+
+The started code was from [Full stack
+Foundations](https://www.udacity.com/course/full-stack-foundations--ud088)'s repo: [Udacity Restaurant Menu
+App](https://github.com/udacity/Full-Stack-Foundations/tree/master/Lesson-4/Final-Project)
+and from [my OAuth2.0 exercise](https://github.com/GeneKao/OAuth2.0) .
+
+
 
 ## Contact
 Any suggestion please contact [me](https://github.com/GeneKao).
