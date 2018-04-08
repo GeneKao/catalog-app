@@ -268,6 +268,14 @@ def deleteProject(project_id):
         return render_template('deleteProject.html', project=projectToDelete)
 
 
+ledger_types = ("ATM", "Bar_Restaurant", "Business expenses", "Cash", "Education",
+                "Family_Friends", "Food_Groceries", "Healthcare_Drug_Stores",
+                "Household_Utilities", "Income", "Insurance_Funances",
+                "Leisure_Enterainment", "Media_Electronics", "Salary",
+                "Saving_Investments", "Shopping", "Subsriptions_Donations",
+                "Tax_Fines", "Transport_Car", "Travel_Holidays")
+
+
 # Show a project ledger
 @app.route('/project/<int:project_id>/')
 @app.route('/project/<int:project_id>/ledger/')
@@ -279,19 +287,13 @@ def showLedger(project_id):
     if 'username' not in login_session or creator.id != login_session['user_id']:
         return render_template('publicledger.html', items=items, project=project, creator=creator)
     else:
-        return render_template('ledger.html', items=items, project=project, creator=creator)
+        return render_template('ledger.html', items=items, project=project, creator=creator, ledger_types=ledger_types)
 
 
 # Create a new ledger item
 @app.route('/project/<int:project_id>/ledger/new/', methods=['GET', 'POST'])
 def newLedgerItem(project_id):
     project = session.query(Project).filter_by(id=project_id).one()
-    ledger_types = ("ATM", "Bar & Restaurant", "Business expenses", "Cash", "Education",
-                    "Family & Friends", "Food & Groceries", "Healthcare & Drug Stores",
-                    "Household & Utilities", "Income", "Insurance & Funances",
-                    "Leisure & Enterainment", "Media & Electronics", "Salary",
-                    "Saving & Investments", "Shopping", "Subsriptions & Donations",
-                    "Tax & Fines", "Transport & Car", "Travel & Holidays")
 
     if request.method == 'POST':
         newItem = Ledger_Item(name=request.form['name'], description=request.form['description'],
@@ -316,16 +318,16 @@ def editLedgerItem(project_id, ledger_id):
             editedItem.name = request.form['name']
         if request.form['description']:
             editedItem.description = request.form['description']
-        if request.form['price']:
-            editedItem.price = request.form['price']
-        if request.form['course']:
-            editedItem.course = request.form['course']
+        if request.form['types']:
+            editedItem.price = request.form['types']
+        if request.form['cost']:
+            editedItem.course = request.form['cost']
             session.add(editedItem)
             session.commit()
             flash('Menu Item Successfully Edited')
         return redirect(url_for('showLedger', project_id=project_id))
     else:
-        return render_template('editLedgerItem.html', project_id=project_id, ledger_id=ledger_id, item=editedItem)
+        return render_template('editLedgerItem.html', project_id=project_id, ledger_id=ledger_id, item=editedItem, ledger_types=ledger_types)
 
 
 # Delete a ledger item
@@ -339,7 +341,7 @@ def deleteLedgerItem(project_id, ledger_id):
         flash('Menu Item Successfully Deleted')
         return redirect(url_for('showLedger', project_id=project_id))
     else:
-        return render_template('deleteLedgerItem.html', item=itemToDelete)
+        return render_template('deleteLedgerItem.html', item=itemToDelete, project_id=project_id)
 
 
 if __name__ == '__main__':

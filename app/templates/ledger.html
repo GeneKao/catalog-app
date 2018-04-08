@@ -57,12 +57,14 @@
   <div class="col-md-1"></div>
   <div class="col-md-4">
     {% for i in items %}
-    <h2> {{ i.types }}</h2>
     <div class="menu-item">
-      <h3>{{i.name}}</h3>
-      <p>{{i.description}}</p>
-      <p class="menu-price">{{i.cost}}</p>
-      <a href='{{url_for('editLedgerItem', project_id = project.id, ledger_id=i.id ) }}'>Edit</a> |
+      <h2> {{ i.name }} </h2>
+      <h3> Cost type: {{ i.types }} </h3>
+      <p> Usage: {{ i.description }} </p>
+      <p> Created date: {{ i.date }} </p>
+      <p class="menu-price">Cost: {{i.cost}}</p>
+
+      <a href='{{url_for('editLedgerItem', project_id = project.id, ledger_id=i.id, ledger_types=ledger_types ) }}'>Edit</a> |
       <a href='{{url_for('deleteLedgerItem', project_id = project.id, ledger_id=i.id ) }}'>Delete</a>
     </div>
     {% endfor %}
