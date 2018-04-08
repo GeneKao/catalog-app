@@ -106,12 +106,12 @@ a {
 .banner h1 {
   margin: 45px 0;
 }
-.restaurant-list {
+.project-list {
   background-color: #F0F0F0;
   padding: 20px;
   u }
-.restaurant-list:hover {
-  background-color: #ffd190;
+.project-list:hover {
+  background-color: #A6E8EB;
   padding: 20px;
 }
 .menu-item {

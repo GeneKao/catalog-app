@@ -179,7 +179,8 @@ def gdisconnect():
         del login_session['picture']
         response = make_response(json.dumps('Successfully disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
-        return response
+        # return response
+        return redirect(url_for('showProjects'))
     else:
         response = make_response(json.dumps(
             'Failed to revoke token for given user.', 400))
@@ -208,8 +209,8 @@ def projectMenuJSON(project_id):
 
 @app.route('/project/<int:project_id>/ledger/<int:ledger_id>/JSON')
 def ledgerItemJSON(project_id, ledger_id):
-    Ledger_Item = session.query(Ledger_Item).filter_by(id=ledger_id).one()
-    return jsonify(Ledger_Item=Ledger_Item.serialize)
+    item = session.query(Ledger_Item).filter_by(id=ledger_id).one()
+    return jsonify(Ledger_Item=item.serialize)
 
 
 @app.route('/project/JSON')
