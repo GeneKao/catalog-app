@@ -1,3 +1,4 @@
+"""Importing sqlalchemy."""
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -7,7 +8,7 @@ Base = declarative_base()
 
 
 class User(Base):
-    """User model"""
+    """User model."""
 
     __tablename__ = 'user'
 
@@ -18,7 +19,7 @@ class User(Base):
 
 
 class Project(Base):
-    """Project model"""
+    """Project model."""
 
     __tablename__ = 'project'
 
@@ -29,7 +30,7 @@ class Project(Base):
 
     @property
     def serialize(self):
-        """Return object data in easily serializeable format"""
+        """Return object data in easily serializeable format."""
         return {
             'name': self.name,
             'id': self.id,
@@ -37,7 +38,7 @@ class Project(Base):
 
 
 class Ledger_Item(Base):
-    """Ledger model"""
+    """Ledger model."""
 
     __tablename__ = 'ledger_item'
 
@@ -54,7 +55,7 @@ class Ledger_Item(Base):
 
     @property
     def serialize(self):
-        """Return object data in easily serializeable format"""
+        """Return object data in easily serializeable format."""
         return {
             'name': self.name,
             'description': self.description,
