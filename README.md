@@ -86,6 +86,16 @@ visit **http://localhost:8000** to view the restaurant menu app.  You should be
 able to view, add, edit, and delete menu items and restaurants. 
 
 
+## Usage and highlight
+
+http://localhost:8000/project/
+![Ledgers](/images/Projects.png)
+
+http://localhost:8000/project/3/ledger/
+![Ledgers](/images/AddLedger.png)
+
+http://localhost:8000/project/3/ledger/
+![Ledgers](/images/Ledgers.png)
 
 
 ## Contact
