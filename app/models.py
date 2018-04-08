@@ -1,6 +1,4 @@
-import datetime
-
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
+from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
@@ -42,7 +40,7 @@ class Ledger_Item(Base):
     description = Column(String(80))
     types = Column(String(250))
     cost = Column(Integer)
-    date = Column(DateTime, default=datetime.datetime.utcnow)
+    date = Column(String(80))
     project_id = Column(Integer, ForeignKey('project.id'))
     project = relationship(Project)
     user_id = Column(Integer, ForeignKey('user.id'))

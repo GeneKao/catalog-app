@@ -8,8 +8,8 @@
   <div class="col-md-11 col-md-offset-1 padding-none">
     <h1>{{ project.name }}
       <figure class="creator">
-        <img src="{{ url_for('static', filename='blank_user.gif') }}">
-        <figcaption>Menu creator's name goes here</figcaption>
+        <img src="{{ creator.picture}}">
+        <figcaption>{{ creator.name }}</figcaption>
       </figure>
     </h1>
 
@@ -59,13 +59,13 @@
     {% for i in items %}
     <div class="menu-item">
       <h2> {{ i.name }} </h2>
-      <h3> Cost type: {{ i.types }} </h3>
-      <p> Usage: {{ i.description }} </p>
-      <p> Created date: {{ i.date }} </p>
-      <p class="menu-price">Cost: {{i.cost}}</p>
+      <h3> Category: {{ i.types }} </h3>
+      <p> Detail: {{ i.description }} </p>
+      <p> Date: {{ i.date }} </p>
+      <p class="menu-price">Cost: {{i.cost}} € </p>
 
-      <a href='{{url_for('editLedgerItem', project_id = project.id, ledger_id=i.id, ledger_types=ledger_types ) }}'>Edit</a> |
-      <a href='{{url_for('deleteLedgerItem', project_id = project.id, ledger_id=i.id ) }}'>Delete</a>
+      <a href='{{url_for('editLedgerItem', project_id = project.id, ledger_id=i.id) }}'>Edit</a> |
+      <a href='{{url_for('deleteLedgerItem', project_id = project.id, ledger_id=i.id, methods="POST" ) }}'>Delete</a>
     </div>
     {% endfor %}
   </div>

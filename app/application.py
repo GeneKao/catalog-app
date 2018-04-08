@@ -298,6 +298,7 @@ def newLedgerItem(project_id):
     if request.method == 'POST':
         newItem = Ledger_Item(name=request.form['name'], description=request.form['description'],
                               types=request.form['types'], cost=request.form['cost'],
+                              date=request.form['date'],
                               project_id=project_id, user_id=project.user_id)
         session.add(newItem)
         session.commit()
@@ -322,6 +323,8 @@ def editLedgerItem(project_id, ledger_id):
             editedItem.price = request.form['types']
         if request.form['cost']:
             editedItem.course = request.form['cost']
+        if request.form['date']:
+            editedItem.course = request.form['date']
             session.add(editedItem)
             session.commit()
             flash('Menu Item Successfully Edited')
@@ -347,4 +350,4 @@ def deleteLedgerItem(project_id, ledger_id):
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
     app.debug = True
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=8000)

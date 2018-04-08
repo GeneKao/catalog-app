@@ -13,6 +13,10 @@
   <div class="col-md-6 col-md-offset-1 padding-top">
     <form action="#" method = "post">
       <div class="form-group">
+
+        <label for="name">Date:</label>
+        <input type ="date" class="form-control" name="date">
+
         <label for="name">Name:</label>
         <input type ="text" maxlength="50" class="form-control" name="name" placeholder= "Name of the expense">
 
@@ -23,11 +27,9 @@
         <label for="types">Type:</label>
         <select class="form-control" name="types">
           <option value="" selected disabled>Please select</option>
-
           {% for ledger_type in ledger_types %}
           <option name="types" value={{ ledger_type }}>{{ ledger_type }}</option>
           {% endfor %}
-
         </select>
 
         <label for="cost">Cost:</label>
