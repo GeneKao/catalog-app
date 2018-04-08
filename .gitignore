@@ -1,3 +1,5 @@
+# to ignore generated files
+
 # General
 .vagrant/
 
@@ -7,6 +9,8 @@
 # python files
 __pycache__
 *.pyc
+*.db
 
-# db
-*db
+
+# Ignore the app secret and client secret for application
+*secrets.json
