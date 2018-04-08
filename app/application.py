@@ -139,7 +139,15 @@ def gconnect():
 
 
 def createUser(login_session):
-    """Create user."""
+    """Create user.
+
+    Args:
+        login_session (obj): Login session.
+
+    Returns:
+        int: User ID.
+
+    """
     newUser = User(name=login_session['username'], email=login_session[
                    'email'], picture=login_session['picture'])
     session.add(newUser)
@@ -149,13 +157,29 @@ def createUser(login_session):
 
 
 def getUserInfo(user_id):
-    """Get user info from id."""
+    """Get user info from id.
+
+    Args:
+        user_id (int): User ID.
+
+    Returns:
+        obj: User object.
+
+    """
     user = session.query(User).filter_by(id=user_id).one()
     return user
 
 
 def getUserID(email):
-    """Get user ID from email."""
+    """Get user ID from email.
+
+    Args:
+        email (str): User email.
+
+    Returns:
+        int: User ID.
+
+    """
     user = session.query(User).filter_by(email=email).one()
     return user.id
 
@@ -211,7 +235,15 @@ def showLogin():
 # JSON APIs to view Project Information
 @app.route('/project/<int:project_id>/ledger/JSON')
 def projectJSON(project_id):
-    """Show a project in JSON format."""
+    """Show a project in JSON format.
+
+    Args:
+        project_id (int): Project ID.
+
+    Returns:
+        str: A project in JSON.
+
+    """
     items = session.query(Ledger_Item).filter_by(
         project_id=project_id).all()
     return jsonify(Ledgers=[i.serialize for i in items])
@@ -219,7 +251,16 @@ def projectJSON(project_id):
 
 @app.route('/project/<int:project_id>/ledger/<int:ledger_id>/JSON')
 def ledgerItemJSON(project_id, ledger_id):
-    """Show public ledger items in JSON format."""
+    """Show public ledger items in JSON format.
+
+    Args:
+        project_id (int): Project ID.
+        ledger_id (int): Ledger ID.
+
+    Returns:
+        str: A Ledger in JSON.
+
+    """
     item = session.query(Ledger_Item).filter_by(id=ledger_id).one().serialize
     public_ledger = {'name': item['name'], 'description': item['description'],
                      'types': item['types'], 'id': item['id']}
@@ -245,7 +286,12 @@ def showProjects():
 # Create a new project
 @app.route('/project/new/', methods=['GET', 'POST'])
 def newProject():
-    """Create a new project."""
+    """Create a new project.
+
+    Returns:
+        obj: If POST render project template, GET render newProject.html.
+
+    """
     if request.method == 'POST':
         newProject = Project(
             name=request.form['name'], user_id=login_session['user_id'])
@@ -260,7 +306,15 @@ def newProject():
 # Edit a project
 @app.route('/project/<int:project_id>/edit/', methods=['GET', 'POST'])
 def editProject(project_id):
-    """Edit a project."""
+    """Edit a project.
+
+    Args:
+        project_id (int): Project ID.
+
+    Returns:
+        obj: If GET render project template, POST render editProject.html.
+
+    """
     editedProject = session.query(
         Project).filter_by(id=project_id).one()
     if request.method == 'POST':
@@ -275,7 +329,15 @@ def editProject(project_id):
 # Delete a project
 @app.route('/project/<int:project_id>/delete/', methods=['GET', 'POST'])
 def deleteProject(project_id):
-    """Delete a project."""
+    """Delete a project.
+
+    Args:
+        project_id (int): Project ID.
+
+    Returns:
+        obj: If POST render project template, GET render deleteProject.html.
+
+    """
     projectToDelete = session.query(
         Project).filter_by(id=project_id).one()
     if request.method == 'POST':
@@ -301,7 +363,15 @@ ledger_types = ("ATM", "Bar_Restaurant", "Business expenses",
 @app.route('/project/<int:project_id>/')
 @app.route('/project/<int:project_id>/ledger/')
 def showLedger(project_id):
-    """Show a ledger."""
+    """Show a ledger.
+
+    Args:
+        project_id (int): Project ID.
+
+    Returns:
+        obj: If login ledger.html, else render publicledger.html.
+
+    """
     project = session.query(Project).filter_by(id=project_id).one()
     creator = getUserInfo(project.user_id)
     items = session.query(Ledger_Item).filter_by(
@@ -319,7 +389,15 @@ def showLedger(project_id):
 # Create a new ledger item
 @app.route('/project/<int:project_id>/ledger/new/', methods=['GET', 'POST'])
 def newLedgerItem(project_id):
-    """Add a new ledger."""
+    """Add a new ledger.
+
+    Args:
+        project_id (int): Project ID.
+
+    Returns:
+        obj: If POST render ledger template, GET render newLedgerItem.html.
+
+    """
     project = session.query(Project).filter_by(id=project_id).one()
 
     if request.method == 'POST':
@@ -345,7 +423,16 @@ def newLedgerItem(project_id):
 @app.route('/project/<int:project_id>/ledger/<int:ledger_id>/edit',
            methods=['GET', 'POST'])
 def editLedgerItem(project_id, ledger_id):
-    """Edit a existing ledger."""
+    """Edit a existing ledger.
+
+    Args:
+        project_id (int): Project ID.
+        ledger_id (int): Ledger ID.
+
+    Returns:
+        obj: If POST render ledger template, GET render editLedgerItem.html.
+
+    """
     editedItem = session.query(Ledger_Item).filter_by(id=ledger_id).one()
     project = session.query(Project).filter_by(id=project_id).one()
     if request.method == 'POST':
@@ -373,7 +460,16 @@ def editLedgerItem(project_id, ledger_id):
 @app.route('/project/<int:project_id>/ledger/<int:ledger_id>/delete',
            methods=['GET', 'POST'])
 def deleteLedgerItem(project_id, ledger_id):
-    """Delete a ledger."""
+    """Delete a ledger.
+
+    Args:
+        project_id (int): Project ID.
+        ledger_id (int): Ledger ID.
+
+    Returns:
+        obj: If POST render ledger template, GET render deleteLedgerItem.html.
+
+    """
     itemToDelete = session.query(Ledger_Item).filter_by(id=ledger_id).one()
     if request.method == 'POST':
         session.delete(itemToDelete)
