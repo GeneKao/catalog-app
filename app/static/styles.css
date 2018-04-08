@@ -71,6 +71,12 @@ a {
   border-color: #aaaaaa;
   color: red;
 }
+.btn.dropdown-toggle{
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding: 15px;
+
+}
 .glyphicon {
   margin-right: 10px;
 }
