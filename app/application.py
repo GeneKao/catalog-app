@@ -234,7 +234,7 @@ def showLogin():
 
 # JSON APIs to view Project Information
 @app.route('/project/<int:project_id>/ledger/JSON')
-def projectJSON(project_id):
+def projectItemJSON(project_id):
     """Show a project in JSON format.
 
     Args:
