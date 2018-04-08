@@ -98,7 +98,7 @@ able to view, add, edit, and delete menu items and restaurants.
 ![Ledgers](/images/ProjectsJSON.png)
 
 
-### http://localhost:8000/project/3/ledger/
+### http://localhost:8000/project/3/ledger/new/
 
 ![Ledgers](/images/AddLedger.png)
 
