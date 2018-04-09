@@ -246,6 +246,9 @@ def projectItemJSON(project_id):
         str: A project in JSON.
 
     """
+    if 'username' not in login_session:
+        return redirect(url_for('showLogin'))
+
     items = session.query(Ledger_Item).filter_by(
         project_id=project_id).all()
     return jsonify(Ledgers=[i.serialize for i in items])
@@ -263,10 +266,18 @@ def ledgerItemJSON(project_id, ledger_id):
         str: A Ledger in JSON.
 
     """
-    item = session.query(Ledger_Item).filter_by(id=ledger_id).one().serialize
-    public_ledger = {'name': item['name'], 'description': item['description'],
-                     'types': item['types'], 'id': item['id']}
-    return jsonify(Ledger_Item=public_ledger)
+    if 'username' not in login_session:
+        return redirect(url_for('showLogin'))
+
+    item = session.query(Ledger_Item).filter_by(id=ledger_id).one()
+    it = item.serialize
+
+    if getUserInfo(item.user_id).id != login_session['user_id']:
+        public_ledger = {'name': it['name'], 'description': it['description'],
+                         'types': it['types'], 'id': it['id']}
+        return jsonify(Ledger_Item=public_ledger)
+    else:
+        return jsonify(Ledger_Item=it)
 
 
 @app.route('/project/JSON')
