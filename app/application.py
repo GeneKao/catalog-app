@@ -294,6 +294,9 @@ def newProject():
         obj: If POST render project template, GET render newProject.html.
 
     """
+    if 'username' not in login_session:
+        return redirect(url_for('showLogin'))
+
     if request.method == 'POST':
         newProject = Project(
             name=request.form['name'], user_id=login_session['user_id'])
@@ -317,8 +320,16 @@ def editProject(project_id):
         obj: If GET render project template, POST render editProject.html.
 
     """
+    if 'username' not in login_session:
+        return redirect(url_for('showLogin'))
+
     editedProject = session.query(
         Project).filter_by(id=project_id).one()
+
+    # only who edit this project can edit it.
+    if getUserInfo(editedProject.user_id).id != login_session['user_id']:
+        return json.dumps({'error': 'Only authorised user can edit this item'})
+
     if request.method == 'POST':
         if request.form['name']:
             editedProject.name = request.form['name']
@@ -340,8 +351,15 @@ def deleteProject(project_id):
         obj: If POST render project template, GET render deleteProject.html.
 
     """
+    if 'username' not in login_session:
+        return redirect(url_for('showLogin'))
+
     projectToDelete = session.query(
         Project).filter_by(id=project_id).one()
+
+    if getUserInfo(projectToDelete.user_id).id != login_session['user_id']:
+        return json.dumps({'error': 'Only authorised user can delete this item'})
+
     if request.method == 'POST':
         session.delete(projectToDelete)
         flash('%s Successfully Deleted' % projectToDelete.name)
@@ -374,10 +392,14 @@ def showLedger(project_id):
         obj: If login ledger.html, else render publicledger.html.
 
     """
+    if 'username' not in login_session:
+        return redirect(url_for('showLogin'))
+
     project = session.query(Project).filter_by(id=project_id).one()
     creator = getUserInfo(project.user_id)
     items = session.query(Ledger_Item).filter_by(
         project_id=project_id).all()
+
     if 'username' not in login_session or \
             creator.id != login_session['user_id']:
         return render_template('publicledger.html',
@@ -400,6 +422,9 @@ def newLedgerItem(project_id):
         obj: If POST render ledger template, GET render newLedgerItem.html.
 
     """
+    if 'username' not in login_session:
+        return redirect(url_for('showLogin'))
+
     project = session.query(Project).filter_by(id=project_id).one()
 
     if request.method == 'POST':
@@ -435,8 +460,15 @@ def editLedgerItem(project_id, ledger_id):
         obj: If POST render ledger template, GET render editLedgerItem.html.
 
     """
+    if 'username' not in login_session:
+        return redirect(url_for('showLogin'))
+
     editedItem = session.query(Ledger_Item).filter_by(id=ledger_id).one()
     project = session.query(Project).filter_by(id=project_id).one()
+
+    if getUserInfo(editedItem.user_id).id != login_session['user_id']:
+        return json.dumps({'error': 'Only authorised user can edit this item'})
+
     if request.method == 'POST':
         if request.form['name']:
             editedItem.name = request.form['name']
@@ -472,7 +504,14 @@ def deleteLedgerItem(project_id, ledger_id):
         obj: If POST render ledger template, GET render deleteLedgerItem.html.
 
     """
+    if 'username' not in login_session:
+        return redirect(url_for('showLogin'))
+
     itemToDelete = session.query(Ledger_Item).filter_by(id=ledger_id).one()
+
+    if getUserInfo(itemToDelete.user_id).id != login_session['user_id']:
+        return json.dumps({'error': 'Only authorised user can delete this item'})
+
     if request.method == 'POST':
         session.delete(itemToDelete)
         session.commit()
