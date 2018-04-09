@@ -369,7 +369,8 @@ def deleteProject(project_id):
         Project).filter_by(id=project_id).one()
 
     if getUserInfo(projectToDelete.user_id).id != login_session['user_id']:
-        return json.dumps({'error': 'Only authorised user can delete this item'})
+        return json.dumps({'error':
+                           'Only authorised user can delete this item'})
 
     if request.method == 'POST':
         session.delete(projectToDelete)
@@ -521,7 +522,8 @@ def deleteLedgerItem(project_id, ledger_id):
     itemToDelete = session.query(Ledger_Item).filter_by(id=ledger_id).one()
 
     if getUserInfo(itemToDelete.user_id).id != login_session['user_id']:
-        return json.dumps({'error': 'Only authorised user can delete this item'})
+        return json.dumps({'error':
+                           'Only authorised user can delete this item'})
 
     if request.method == 'POST':
         session.delete(itemToDelete)
