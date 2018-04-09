@@ -9,6 +9,8 @@
     <a href="{{url_for('showLogin')}}">Click Here to Login </a>
     {% else %}
     <a href="{{url_for('gdisconnect')}}">Logout </a>
+    <br><br>
+    <p>Logged in as : {{ session.username }}</p>
     {% endif %}
 
   </div>
