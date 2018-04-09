@@ -1,4 +1,14 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+""" My bookkeeping app.
+
+Example:
+    To run this code using python3 on the console to
+    start the flask server. and go to http://localhost:8000/
+
+    python3 application.py
+"""
 
 from models import Base, User, Project, Ledger_Item
 
@@ -18,20 +28,10 @@ from sqlalchemy.orm import sessionmaker
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
 
-""" My bookkeeping app.
-
-Example:
-    To run this code using python3 on the console to
-    start the flask server. and go to http://localhost:8000/
-
-    python3 application.py
-"""
-
 __author__ = "Gene Ting-Chun Kao"
 __email__ = "kao.gene@gmail.com"
 
 app = Flask(__name__)
-
 
 APPLICATION_NAME = "My Bookkeeping App"
 CLIENT_ID = json.loads(
@@ -187,7 +187,7 @@ def getUserID(email):
 
 
 # DISCONNECT - Revoke a current user's token and reset their login_session
-@app.route('/gdisconnect')
+@app.route('/logout')
 def gdisconnect():
     """Google log out funciton."""
     access_token = login_session.get('access_token')
