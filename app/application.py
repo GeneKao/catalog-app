@@ -18,6 +18,7 @@ import httplib2
 import json
 import requests
 
+from functools import wraps
 from flask import (Flask, render_template, request, redirect,
                    jsonify, url_for, flash, make_response)
 from flask import session as login_session
@@ -223,6 +224,17 @@ def gdisconnect():
         return response
 
 
+def login_required(fn):
+    @wraps(fn)
+    def decorator(*args, **kwargs):
+        if 'username' in login_session:
+            return fn(*args, **kwargs)
+        else:
+            flash("You are not allowed to access there")
+            return redirect(url_for('showLogin'))
+    return decorator
+
+
 @app.route('/login')
 def showLogin():
     """Login page."""
@@ -236,6 +248,7 @@ def showLogin():
 
 # JSON APIs to view Project Information
 @app.route('/project/<int:project_id>/ledger/JSON')
+@login_required
 def projectItemJSON(project_id):
     """Show a project in JSON format.
 
@@ -246,15 +259,13 @@ def projectItemJSON(project_id):
         str: A project in JSON.
 
     """
-    if 'username' not in login_session:
-        return redirect(url_for('showLogin'))
-
     items = session.query(Ledger_Item).filter_by(
         project_id=project_id).all()
     return jsonify(Ledgers=[i.serialize for i in items])
 
 
 @app.route('/project/<int:project_id>/ledger/<int:ledger_id>/JSON')
+@login_required
 def ledgerItemJSON(project_id, ledger_id):
     """Show public ledger items in JSON format.
 
@@ -266,9 +277,6 @@ def ledgerItemJSON(project_id, ledger_id):
         str: A Ledger in JSON.
 
     """
-    if 'username' not in login_session:
-        return redirect(url_for('showLogin'))
-
     item = session.query(Ledger_Item).filter_by(id=ledger_id).one()
     it = item.serialize
 
@@ -298,6 +306,7 @@ def showProjects():
 
 # Create a new project
 @app.route('/project/new/', methods=['GET', 'POST'])
+@login_required
 def newProject():
     """Create a new project.
 
@@ -305,9 +314,6 @@ def newProject():
         obj: If POST render project template, GET render newProject.html.
 
     """
-    if 'username' not in login_session:
-        return redirect(url_for('showLogin'))
-
     if request.method == 'POST':
         newProject = Project(
             name=request.form['name'], user_id=login_session['user_id'])
@@ -321,6 +327,7 @@ def newProject():
 
 # Edit a project
 @app.route('/project/<int:project_id>/edit/', methods=['GET', 'POST'])
+@login_required
 def editProject(project_id):
     """Edit a project.
 
@@ -331,9 +338,6 @@ def editProject(project_id):
         obj: If GET render project template, POST render editProject.html.
 
     """
-    if 'username' not in login_session:
-        return redirect(url_for('showLogin'))
-
     editedProject = session.query(
         Project).filter_by(id=project_id).one()
 
@@ -352,6 +356,7 @@ def editProject(project_id):
 
 # Delete a project
 @app.route('/project/<int:project_id>/delete/', methods=['GET', 'POST'])
+@login_required
 def deleteProject(project_id):
     """Delete a project.
 
@@ -362,9 +367,6 @@ def deleteProject(project_id):
         obj: If POST render project template, GET render deleteProject.html.
 
     """
-    if 'username' not in login_session:
-        return redirect(url_for('showLogin'))
-
     projectToDelete = session.query(
         Project).filter_by(id=project_id).one()
 
@@ -394,6 +396,7 @@ ledger_types = ("ATM", "Bar_Restaurant", "Business expenses",
 # Show a project ledger
 @app.route('/project/<int:project_id>/')
 @app.route('/project/<int:project_id>/ledger/')
+@login_required
 def showLedger(project_id):
     """Show a ledger.
 
@@ -404,9 +407,6 @@ def showLedger(project_id):
         obj: If login ledger.html, else render publicledger.html.
 
     """
-    if 'username' not in login_session:
-        return redirect(url_for('showLogin'))
-
     project = session.query(Project).filter_by(id=project_id).one()
     creator = getUserInfo(project.user_id)
     items = session.query(Ledger_Item).filter_by(
@@ -424,6 +424,7 @@ def showLedger(project_id):
 
 # Create a new ledger item
 @app.route('/project/<int:project_id>/ledger/new/', methods=['GET', 'POST'])
+@login_required
 def newLedgerItem(project_id):
     """Add a new ledger.
 
@@ -434,9 +435,6 @@ def newLedgerItem(project_id):
         obj: If POST render ledger template, GET render newLedgerItem.html.
 
     """
-    if 'username' not in login_session:
-        return redirect(url_for('showLogin'))
-
     project = session.query(Project).filter_by(id=project_id).one()
 
     if request.method == 'POST':
@@ -461,6 +459,7 @@ def newLedgerItem(project_id):
 # Edit a ledger item
 @app.route('/project/<int:project_id>/ledger/<int:ledger_id>/edit',
            methods=['GET', 'POST'])
+@login_required
 def editLedgerItem(project_id, ledger_id):
     """Edit a existing ledger.
 
@@ -472,9 +471,6 @@ def editLedgerItem(project_id, ledger_id):
         obj: If POST render ledger template, GET render editLedgerItem.html.
 
     """
-    if 'username' not in login_session:
-        return redirect(url_for('showLogin'))
-
     editedItem = session.query(Ledger_Item).filter_by(id=ledger_id).one()
     project = session.query(Project).filter_by(id=project_id).one()
 
@@ -492,9 +488,9 @@ def editLedgerItem(project_id, ledger_id):
             editedItem.course = request.form['cost']
         if request.form['date']:
             editedItem.course = request.form['date']
-            session.add(editedItem)
-            session.commit()
-            flash('Menu Item Successfully Edited')
+        session.add(editedItem)
+        session.commit()
+        flash('Menu Item Successfully Edited')
         return redirect(url_for('showLedger', project_id=project_id))
     else:
         return render_template('editLedgerItem.html',
@@ -505,6 +501,7 @@ def editLedgerItem(project_id, ledger_id):
 # Delete a ledger item
 @app.route('/project/<int:project_id>/ledger/<int:ledger_id>/delete',
            methods=['GET', 'POST'])
+@login_required
 def deleteLedgerItem(project_id, ledger_id):
     """Delete a ledger.
 
@@ -516,9 +513,6 @@ def deleteLedgerItem(project_id, ledger_id):
         obj: If POST render ledger template, GET render deleteLedgerItem.html.
 
     """
-    if 'username' not in login_session:
-        return redirect(url_for('showLogin'))
-
     itemToDelete = session.query(Ledger_Item).filter_by(id=ledger_id).one()
 
     if getUserInfo(itemToDelete.user_id).id != login_session['user_id']:
