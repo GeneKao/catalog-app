@@ -487,7 +487,7 @@ def editLedgerItem(project_id, ledger_id):
         if request.form['cost']:
             editedItem.course = request.form['cost']
         if request.form['date']:
-            editedItem.course = request.form['date']
+            editedItem.date = request.form['date']
         session.add(editedItem)
         session.commit()
         flash('Menu Item Successfully Edited')
